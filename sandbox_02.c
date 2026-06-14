@@ -1,46 +1,31 @@
-#include <stdbool.h>
+
 #include <stdio.h>
 #include <string.h>
 
 int main() {
 
-  char name[90];
-  char email[90];
+  char name[50];
+  int len;
 
-  // fgets(char *restrict s, int n, FILE *restrict stream);
-  //  restrict is a keyword telling the compiler that the  pointers don't
-  //  overlap in memory
 
-  // char *s : buffer to write into
-  // int n         // max bytes to read - prevents buffer overflow
-  // FILE *stream  // where to read from - stdin, or a file pointer
-  // fgets(name, sizeof(name), stdin);
-  //          ^^^^^^^^^^^^  reads max 49 chars + \0
-
-  // validate name
   do {
-    // validation
-    printf("Enter name: ");
+    printf("Enter a name: ");
+    // scanf("%s", name);
+    // John snow + \0
     fgets(name, sizeof(name), stdin);
-    name[strcspn(name, "\n")] = '\0'; // strip newline
+    // overwrite the \0 to \n
+    name[strcspn(name, "\n")] = '\0';
 
-    if (name[0] == '\0') {
-      printf("name cannot be empty, try again\n");
+    len = strlen(name);
+    if (len > 8) {
+      printf("Lenght must not be greater than 8\n");
+      // return 1;
     }
 
-  } while (name[0] == '\0');
+  } while (len > 8);
 
-  // validate email independently
-  do {
-    printf("Enter email: ");
-    fgets(email, sizeof(email), stdin);
-    email[strcspn(email, "\n")] = '\0';
-    if (email[0] == '\0') {
-      printf("email cannot be empty, try again\n");
-    }
-  } while (email[0] == '\0');
-
-  printf("name: %s\nemail: %s\n", name, email);
+  printf("Lenght is: %d\n", len);
+  printf("Name is: %s\n", name);
 
   return 0;
 }
