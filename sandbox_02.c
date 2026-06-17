@@ -1,30 +1,16 @@
 #include <stdio.h>
 
-typedef struct animal {
-    char *name;
-    int age;
-} animalia;
-
-// anonymous structs
-typedef struct {
-    char *color;
-    int height;
-} Person;
+// if you have a pointer to a type, adding one to the pointer moves to the next
+// item of that type directly after it in memory.
 
 int main() {
-    // both works
-    animalia lion = {"lion", 18};
-    struct animal tiger = {"tiger", 18};
 
-    printf("animalia: %s\n", lion.name);
-    printf("animal: %s\n", tiger.name);
+    int a[10] = {1, 2, 3, 4, 5};
+    // int *p = a;" works just as well
+    int *p = &a[0]; // Then let’s get a pointer to the first element in that
+                    // array:
 
-    Person p1 = {"black", 180};
-    printf("person one is: %s\n", p1.color);
-
-    // positional
-    Person p2 = {.height = 190, .color = "red"};
-    printf("person 2 is: %s and height is %d\n", p2.color, p2.height);
+    printf("%d\n", *p); // Prints 1
 
     return 0;
 }
