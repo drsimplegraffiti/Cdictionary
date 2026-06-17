@@ -1,31 +1,30 @@
-
 #include <stdio.h>
-#include <string.h>
+
+typedef struct animal {
+    char *name;
+    int age;
+} animalia;
+
+// anonymous structs
+typedef struct {
+    char *color;
+    int height;
+} Person;
 
 int main() {
+    // both works
+    animalia lion = {"lion", 18};
+    struct animal tiger = {"tiger", 18};
 
-  char name[50];
-  int len;
+    printf("animalia: %s\n", lion.name);
+    printf("animal: %s\n", tiger.name);
 
+    Person p1 = {"black", 180};
+    printf("person one is: %s\n", p1.color);
 
-  do {
-    printf("Enter a name: ");
-    // scanf("%s", name);
-    // John snow + \0
-    fgets(name, sizeof(name), stdin);
-    // overwrite the \0 to \n
-    name[strcspn(name, "\n")] = '\0';
+    // positional
+    Person p2 = {.height = 190, .color = "red"};
+    printf("person 2 is: %s and height is %d\n", p2.color, p2.height);
 
-    len = strlen(name);
-    if (len > 8) {
-      printf("Lenght must not be greater than 8\n");
-      // return 1;
-    }
-
-  } while (len > 8);
-
-  printf("Lenght is: %d\n", len);
-  printf("Name is: %s\n", name);
-
-  return 0;
+    return 0;
 }
