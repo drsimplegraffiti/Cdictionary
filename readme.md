@@ -2449,3 +2449,1012 @@ int main(void) {
     return 0;
 }
 ```
+
+### Pass struct to a function
+```c
+#include <stdio.h>
+
+struct s {
+    int a, b;
+};
+
+int add(struct s x)
+{
+    return x.a + x.b;
+}
+
+int main(void)
+{
+    int t = add((struct s){.a=2, .b=4});  // <-- Here
+
+    printf("%d\n", t);
+}
+```
+
+### _Bool types
+```c
+
+#include <stdio.h>
+
+int main(void) {
+    _Bool is_tall = 1;
+    printf("%d \n", is_tall);
+    return 0;
+}
+```
+
+### Complex type
+```c
+
+#include <complex.h>
+#include <stdio.h>
+
+int main(void) {
+    complex float x = 1.2 + 2.3 * I;
+    complex double y = 1.2 + 2.3 * I;
+
+    printf("%lf %lf\n", x, y);
+    return 0;
+}
+```
+
+### Complex type
+```c
+
+#include <complex.h>
+#include <stdio.h>
+
+int main(void) {
+    complex float x = 1.2 + 2.3 * I;
+    complex double y = 1.2 + 2.3 * I;
+
+    printf("%%lf %%lf\n", x, y);
+    return 0;
+}
+```
+
+
+### enums
+```c
+#include <complex.h>
+#include <stdio.h>
+
+enum animal {
+    ANTELOPE = 4,
+    BADGER, // Will be 5
+    CAT,    // Will be 6
+    DOG = 3,
+    ELEPHANT, // Will be 4
+    FISH      // Will be 5
+};
+
+int main(void) {
+    enum animal A = BADGER;
+    printf("animal A: %d\n", A);
+    return 0;
+}
+```
+
+
+
+### compound literal
+```c
+#include <stdio.h>
+
+struct s {
+    int a, b;
+};
+
+int add(struct s x)
+{
+    return x.a + x.b;
+}
+
+int main(void)
+{
+    int t = add((struct s){.a=2, .b=4});  // <-- Here
+
+    printf("%d\n", t);
+}
+```
+
+### Typedef
+```c
+#include <stdio.h>
+
+typedef int time_counter;
+
+int main(void)
+
+{
+    time_counter t = 90;
+    printf("t is now %d\n", t);
+}
+```
+
+
+### 
+```c
+const int a;        // a is a constant int — cannot be reassigned
+const int *p;        // p is a pointer to a const int — *p is read-only, p itself can change
+int * const p;        // p is a const pointer to int — p can't be reassigned, but *p can change
+const int * const p;  // both: p can't be reassigned AND *p is read-only
+
+int * restrict p;     // p is the ONLY pointer used to access this memory (optimization hint, no runtime effect)
+
+volatile int a;       // a may change outside normal program flow (hardware, signal handler) — always re-read from memory, never cached/optimized away
+
+#include <stdatomic.h>
+atomic_int a;          // a's reads/writes are atomic — safe across threads without a data race
+```
+
+### variadic function
+```c
+
+#include <stdio.h>
+#include <stdarg.h>
+
+// Variadic function: takes a count, then that many ints
+int sum(int count, ...) {
+    va_list args;
+    va_start(args, count);   // start reading args after 'count'
+
+    int total = 0;
+    for (int i = 0; i < count; i++) {
+        total += va_arg(args, int);  // pull next int from the list
+    }
+
+    va_end(args);  // clean up
+    return total;
+}
+
+// Another example: mimic a tiny printf-like function
+void log_ints(const char *label, int count, ...) {
+    va_list args;
+    va_start(args, count);
+
+    printf("%s: ", label);
+    for (int i = 0; i < count; i++) {
+        printf("%d ", va_arg(args, int));
+    }
+    printf("\n");
+
+    va_end(args);
+}
+
+int main(void) {
+    printf("Sum: %d\n", sum(4, 10, 20, 30, 40));  // Sum: 100
+    log_ints("Values", 3, 1, 2, 3);                // Values: 1 2 3
+    return 0;
+}
+```
+
+
+### assert
+```c
+
+// <assert.h> Runtime and Compile-time Diagnostics
+// #define NDEBUG 1   // uncomment this to disable the assert
+
+#include <assert.h>
+#include <stdio.h>
+
+int goat_count = 10;
+
+void divide_goat_herd_by(int amount) {
+    assert(amount != 0);
+
+    goat_count /= amount;
+}
+
+int main(void) {
+    divide_goat_herd_by(2); // OK
+
+    divide_goat_herd_by(0); // Causes the assert to fire
+}
+```
+
+
+```c
+#include <stdio.h>
+#include <assert.h>
+
+#define ARRAY_SIZE 16
+
+int main(void)
+{
+    static_assert(ARRAY_SIZE >= 16, "ARRAY_SIZE too small"); // now true, compiles fine
+
+    int a[ARRAY_SIZE];
+    a[10] = 10;          // valid index (0..15)
+
+    printf("%d\n", a[10]);
+}
+```
+
+
+### Complex 
+
+```c
+
+#include <stdio.h>
+#include <math.h>
+#include <complex.h>
+
+int main(void)
+{
+    double complex x = 1 + 2 * I;
+    double complex y = 3 + 4 * I;
+    double complex z = 8 + 1.5708 * I;
+    double complex r;
+    double d;
+
+    // Build / decompose
+    r = CMPLX(1, 2);
+    printf("CMPLX:  %f + %fi\n", creal(r), cimag(r));
+    printf("creal:  %f\n", creal(x));
+    printf("cimag:  %f\n", cimag(x));
+    printf("conj:   %f + %fi\n", creal(conj(x)), cimag(conj(x)));
+
+    // Magnitude / angle
+    printf("cabs:   %f\n", cabs(x));
+    printf("carg:   %f\n", carg(x));
+
+    // Exponential / log / power / roots
+    printf("cexp:   %f + %fi\n", creal(cexp(x)), cimag(cexp(x)));
+    printf("clog:   %f + %fi\n", creal(clog(x)), cimag(clog(x)));
+    r = cpow(x, y);
+    printf("cpow:   %f + %fi\n", creal(r), cimag(r));
+    printf("csqrt:  %f + %fi\n", creal(csqrt(x)), cimag(csqrt(x)));
+
+    // Trig
+    printf("ccos:   %f + %fi\n", creal(ccos(z)), cimag(ccos(z)));
+    printf("csin:   %f + %fi\n", creal(csin(z)), cimag(csin(z)));
+    printf("ctan:   %f + %fi\n", creal(ctan(z)), cimag(ctan(z)));
+
+    // Inverse trig
+    printf("cacos:  %f + %fi\n", creal(cacos(z)), cimag(cacos(z)));
+    printf("casin:  %f + %fi\n", creal(casin(z)), cimag(casin(z)));
+    printf("catan:  %f + %fi\n", creal(catan(z)), cimag(catan(z)));
+
+    // Hyperbolic
+    printf("ccosh:  %f + %fi\n", creal(ccosh(z)), cimag(ccosh(z)));
+    printf("csinh:  %f + %fi\n", creal(csinh(z)), cimag(csinh(z)));
+    printf("ctanh:  %f + %fi\n", creal(ctanh(z)), cimag(ctanh(z)));
+
+    // Inverse hyperbolic
+    printf("cacosh: %f + %fi\n", creal(cacosh(z)), cimag(cacosh(z)));
+    printf("casinh: %f + %fi\n", creal(casinh(z)), cimag(casinh(z)));
+    printf("catanh: %f + %fi\n", creal(catanh(z)), cimag(catanh(z)));
+
+    // Projection (Riemann sphere) — interesting at infinity
+    d = INFINITY;
+    r = cproj(d + 2 * I);
+    printf("cproj:  %f + %fi\n", creal(r), cimag(r));
+
+    return 0;
+}
+
+
+// gcc -std=c11 sandbox_02.c -lm -o main
+```
+
+### C programming
+```c
+#include <ctype.h>
+#include <stdio.h>
+
+//  Character Classification and Conversion
+int main(void) {
+
+    printf("%s\n", isalnum('a') ? "yes" : "no"); // yes
+    printf("%s\n", isalnum('B') ? "yes" : "no"); // yes
+    printf("%s\n", isalnum('5') ? "yes" : "no"); // yes
+    printf("%s\n", isalnum('?') ? "yes" : "no"); // no
+
+    printf("=>>>>>>>>>>>=============>>>>>>>>>>>>>>>>>>==========>>>>>\n");
+    printf("%s\n", isalpha('a') ? "yes" : "no"); // yes
+    printf("%s\n", isalpha('B') ? "yes" : "no"); // yes
+    printf("%s\n", isalpha('5') ? "yes" : "no"); // no
+    printf("%s\n", isalpha('?') ? "yes" : "no"); // no
+
+    printf("=>>>>>>>>>>>=============>>>>>>>>>>>>>>>>>>==========>>>>>\n");
+    printf("%s\n", isblank(' ') ? "yes" : "no");  // yes
+    printf("%s\n", isblank('\t') ? "yes" : "no"); // yes
+    printf("%s\n", isblank('\n') ? "yes" : "no"); // no
+    printf("%s\n", isblank('a') ? "yes" : "no");  // no
+    printf("%s\n", isblank('?') ? "yes" : "no");  // no
+
+    printf("=>>>>>>>>>>>=============>>>>>>>>>>>>>>>>>>==========>>>>>\n");
+    printf("%s\n", iscntrl('\t') ? "yes" : "no"); // yes (tab)
+    printf("%s\n", iscntrl('\n') ? "yes" : "no"); // yes (newline)
+    printf("%s\n", iscntrl('\r') ? "yes" : "no"); // yes (return)
+    printf("%s\n", iscntrl('\a') ? "yes" : "no"); // yes (bell)
+    printf("%s\n", iscntrl(' ') ? "yes" : "no");  // no
+    printf("%s\n", iscntrl('a') ? "yes" : "no");  // no
+    printf("%s\n", iscntrl('?') ? "yes" : "no");  // no
+
+    printf("=>>>>>>>>>>>=============>>>>>>>>>>>>>>>>>>==========>>>>>\n");
+    printf("%s\n", isdigit('0') ? "yes" : "no"); // yes
+    printf("%s\n", isdigit('5') ? "yes" : "no"); // yes
+    printf("%s\n", isdigit('a') ? "yes" : "no"); // no
+    printf("%s\n", isdigit('B') ? "yes" : "no"); // no
+    printf("%s\n", isdigit('?') ? "yes" : "no"); // no
+
+    printf("=>>>>>>>>>>>=============>>>>>>>>>>>>>>>>>>==========>>>>>\n");
+    printf("%s\n", isgraph('0') ? "yes" : "no");  // yes
+    printf("%s\n", isgraph('a') ? "yes" : "no");  // yes
+    printf("%s\n", isgraph('B') ? "yes" : "no");  // yes
+    printf("%s\n", isgraph('?') ? "yes" : "no");  // yes
+    printf("%s\n", isgraph(' ') ? "yes" : "no");  // no
+    printf("%s\n", isgraph('\n') ? "yes" : "no"); // no
+
+    printf("=>>>>>>>>>>>=============>>>>>>>>>>>>>>>>>>==========>>>>>\n");
+    printf("%s\n", islower('c') ? "yes" : "no"); // yes
+    printf("%s\n", islower('0') ? "yes" : "no"); // no
+    printf("%s\n", islower('B') ? "yes" : "no"); // no
+    printf("%s\n", islower('?') ? "yes" : "no"); // no
+    printf("%s\n", islower(' ') ? "yes" : "no"); // no
+
+    printf("=>>>>>>>>>>>=============>>>>>>>>>>>>>>>>>>==========>>>>>\n");
+    printf("%s\n", isprint('c') ? "yes" : "no");  // yes
+    printf("%s\n", isprint('0') ? "yes" : "no");  // yes
+    printf("%s\n", isprint(' ') ? "yes" : "no");  // yes
+    printf("%s\n", isprint('\r') ? "yes" : "no"); // no
+
+    // PUNCTUATION
+    printf("=>>>>>>>>>>>=============>>>>>>>>>>>>>>>>>>==========>>>>>\n");
+    printf("%s\n", ispunct(',') ? "yes" : "no");  // yes
+    printf("%s\n", ispunct('!') ? "yes" : "no");  // yes
+    printf("%s\n", ispunct('c') ? "yes" : "no");  // no
+    printf("%s\n", ispunct('0') ? "yes" : "no");  // no
+    printf("%s\n", ispunct(' ') ? "yes" : "no");  // no
+    printf("%s\n", ispunct('\n') ? "yes" : "no"); // no
+
+    // is space
+    printf("=>>>>>>>>>>>=============>>>>>>>>>>>>>>>>>>==========>>>>>\n");
+    printf("%s\n", isspace(' ') ? "yes" : "no");  // yes
+    printf("%s\n", isspace('\n') ? "yes" : "no"); // yes
+    printf("%s\n", isspace('\t') ? "yes" : "no"); // yes
+    printf("%s\n", isspace(',') ? "yes" : "no");  // no
+    printf("%s\n", isspace('!') ? "yes" : "no");  // no
+    printf("%s\n", isspace('c') ? "yes" : "no");  // no
+
+    // is upper
+    printf("=>>>>>>>>>>>=============>>>>>>>>>>>>>>>>>>==========>>>>>\n");
+    printf("%s\n", isupper('B') ? "yes" : "no"); // yes
+    printf("%s\n", isupper('c') ? "yes" : "no"); // no
+    printf("%s\n", isupper('0') ? "yes" : "no"); // no
+    printf("%s\n", isupper('?') ? "yes" : "no"); // no
+    printf("%s\n", isupper(' ') ? "yes" : "no"); // no
+
+    // is hex decimal
+    printf("=>>>>>>>>>>>=============>>>>>>>>>>>>>>>>>>==========>>>>>\n");
+    printf("%s\n", isxdigit('B') ? "yes" : "no"); // yes
+    printf("%s\n", isxdigit('c') ? "yes" : "no"); // yes
+    printf("%s\n", isxdigit('2') ? "yes" : "no"); // yes
+    printf("%s\n", isxdigit('G') ? "yes" : "no"); // no
+    printf("%s\n", isxdigit('?') ? "yes" : "no"); // no
+
+    // to lower
+    printf("=>>>>>>>>>>>=============>>>>>>>>>>>>>>>>>>==========>>>>>\n");
+    printf("%c\n", tolower('B')); // b (made lowercase!)
+    printf("%c\n", tolower('e')); // e (unchanged)
+    printf("%c\n", tolower('!')); // ! (unchanged)
+
+    // to upper
+    printf("=>>>>>>>>>>>=============>>>>>>>>>>>>>>>>>>==========>>>>>\n");
+    printf("%c\n", toupper('B')); // B (unchanged)
+    printf("%c\n", toupper('e')); // E (made uppercase!)
+    printf("%c\n", toupper('!')); // ! (unchanged)
+    return 0;
+}
+
+// gcc -std=c11 sandbox_02.c -lm -o main
+```
+
+### Errorno
+
+```c
+
+#include <errno.h>
+#include <math.h>
+#include <stdio.h>
+
+// <errno.h> Error Information
+
+int main(void) {
+
+    // errno 	Holds the error status of the last call
+    // errno is set to 0 on startup
+    // If you’re going to use solely it to check for errors, set it to 0 before
+    // the call and then check it after.
+
+    // This is commonly used in conjunction with perror() to get a
+    // human-readable error message that corresponds to the specific error.
+
+    // Important Safety Tip: You should never make your own variable called
+    // errno—that’s undefined behavior.
+
+    double x;
+
+    errno = 0; // Make sure this is clear before the call
+
+    // x = acos(2.0); // Invalid argument to acos()
+    // acos() requires its argument to be in the range [-1.0, 1.0] 
+    x = acos(0.5); // valid: acos(0.5) ≈ 1.047198 (radians, = 60°)
+
+    if (errno == EDOM)
+        perror("acos");
+    else
+        printf("Answer is %f\n", x);
+
+    return 0;
+}
+
+// gcc -std=c11 sandbox_02.c -lm -o main
+```
+
+
+```c
+#include <stdio.h>
+#include <math.h>
+#include <errno.h>
+
+int main(void)
+{
+    double x;
+
+    errno = 0;       // Make sure this is clear before the call
+
+    x = exp(1e+30);  // Pass in some too-huge number, Failed
+    // x = exp(30);  // Pass in some too-huge number, Pass
+
+    if (errno == ERANGE)
+        perror("exp");
+    else
+        printf("Answer is %f\n", x);
+
+    return 0;
+}
+```
+
+
+### Errorno
+```c
+#include <stdio.h>
+#include <string.h>
+#include <wchar.h>
+#include <errno.h>
+#include <locale.h>
+
+int main(void)
+{
+    setlocale(LC_ALL, "");
+
+    char *bad_str = "\xff";  // Probably invalid char in this locale
+    wchar_t wc;
+    size_t result;
+    mbstate_t ps;
+
+    memset(&ps, 0, sizeof ps);
+
+    result = mbrtowc(&wc, bad_str, 1, &ps);
+
+    if (result == (size_t)(-1))
+        perror("mbrtowc");  // mbrtowc: Illegal byte sequence
+    else
+        printf("Converted to L'%lc'\n", wc);
+
+    return 0;
+}
+```
+
+
+### <wctype.h> Wide Character Classification and Transformation
+```c
+
+#include <stdio.h>   // fflush(stdout)
+#include <wchar.h>
+#include <wctype.h>
+
+int main(void)
+{
+    wchar_t c = L'B';
+
+    // --- Classification (iswXXXX) ---
+    wprintf(L"iswalnum:  %ls\n", iswalnum(c)  ? L"yes" : L"no"); // alphabetic or digit
+    wprintf(L"iswalpha:  %ls\n", iswalpha(c)  ? L"yes" : L"no"); // A-Z / a-z
+    wprintf(L"iswblank:  %ls\n", iswblank(L' ') ? L"yes" : L"no"); // space/tab (line-separator whitespace)
+    wprintf(L"iswcntrl:  %ls\n", iswcntrl(L'\n') ? L"yes" : L"no"); // control char (0x00-0x1F, 0x7F)
+    wprintf(L"iswdigit:  %ls\n", iswdigit(L'5') ? L"yes" : L"no"); // 0-9
+    wprintf(L"iswgraph:  %ls\n", iswgraph(c)  ? L"yes" : L"no"); // printable, non-space
+    wprintf(L"iswlower:  %ls\n", iswlower(L'c') ? L"yes" : L"no"); // a-z
+    wprintf(L"iswprint:  %ls\n", iswprint(c)  ? L"yes" : L"no"); // printable, incl. space
+    wprintf(L"iswpunct:  %ls\n", iswpunct(L',') ? L"yes" : L"no"); // punctuation
+    wprintf(L"iswspace:  %ls\n", iswspace(L' ') ? L"yes" : L"no"); // whitespace
+    wprintf(L"iswupper:  %ls\n", iswupper(c)  ? L"yes" : L"no"); // A-Z
+    wprintf(L"iswxdigit: %ls\n", iswxdigit(c) ? L"yes" : L"no"); // 0-9, a-f, A-F
+
+    // --- Runtime classification: wctype() + iswctype() ---
+    wctype_t cls = wctype("digit");           // get class handle for "digit" at runtime
+    wprintf(L"iswctype(digit): %ls\n",
+        iswctype(L'5', cls) ? L"yes" : L"no"); // same as iswdigit('5')
+
+    // --- Conversion ---
+    wprintf(L"towlower: %lc\n", towlower(c));  // B -> b
+    wprintf(L"towupper: %lc\n", towupper(L'e')); // e -> E
+
+    // --- Runtime conversion: wctrans() + towctrans() ---
+    wctrans_t conv = wctrans("toupper");       // get conversion handle at runtime
+    wprintf(L"towctrans(toupper): %lc\n",
+        towctrans(L'b', conv));                // same as towupper('b') -> B
+
+    return 0;
+}
+```
+
+
+### date and time
+```c
+#include <stdio.h>
+#include <time.h>
+#include <stdlib.h>  // ldiv()
+#include <math.h>    // modfl()
+
+int main(void)
+{
+    // --- time(): current calendar time (time_t) ---
+    time_t now = time(NULL);
+
+    // --- ctime()/asctime(): human-readable string (NOT thread-safe, shares static buffer) ---
+    printf("ctime:    %s", ctime(&now));               // "Mon Mar  1 21:32:23 2021\n"
+
+    // --- localtime()/gmtime(): time_t -> struct tm (NOT thread-safe, shares static buffer) ---
+    struct tm *local = localtime(&now);
+    struct tm *utc   = gmtime(&now);
+    printf("asctime local: %s", asctime(local));        // local broken-down time as string
+    printf("asctime UTC  : %s", asctime(utc));
+
+    // --- mktime(): struct tm (local time) -> time_t ---
+    struct tm bdt = {
+        .tm_year = 82,  // years since 1900 -> 1982
+        .tm_mon  = 3,   // 0-11 -> April
+        .tm_mday = 12,
+        .tm_hour = 4,
+        .tm_min  = 0,
+        .tm_sec  = 4,
+        .tm_isdst = -1, // let mktime() figure out DST
+    };
+    time_t cal_a = mktime(&bdt);   // fills in tm_wday, tm_yday, tm_isdst too
+
+    // --- timegm() (C23 / many platforms): struct tm (UTC) -> time_t, no DST involved ---
+    // time_t cal_utc = timegm(&bdt);
+
+    // --- difftime(): seconds between two time_t (don't subtract directly, type is opaque) ---
+    time_t cal_b = now;
+    double diff_seconds = difftime(cal_b, cal_a);
+    printf("Diff: %f seconds (%f years)\n",
+        diff_seconds, diff_seconds / 60 / 60 / 24 / 365.2425);
+
+    // --- strftime(): flexible, thread-safe formatted output (the sprintf() of dates) ---
+    char s[128];
+    strftime(s, sizeof s, "%A, %B %d, %Y", local);
+    puts(s);                                             // "Monday, March 01, 2021"
+
+    strftime(s, sizeof s, "%I:%M:%S %p", local);
+    puts(s);                                              // "09:29:00 PM"
+
+    strftime(s, sizeof s, "%FT%T%z", local);              // ISO 8601
+    puts(s);                                              // "2021-03-01T21:29:00-0800"
+
+    // --- clock(): CPU time used by this process (NOT wall-clock time) ---
+    clock_t c_start = clock();
+    for (volatile long i = 0; i < 100000000; i++); // busy work
+    printf("CPU time: %f seconds\n", (clock() - c_start) / (double)CLOCKS_PER_SEC);
+
+    // --- timespec_get(): higher-resolution (nanosecond) time ---
+    struct timespec ts;
+    timespec_get(&ts, TIME_UTC);
+    printf("timespec: %lld s, %ld ns (%.9f s total)\n",
+        (long long)ts.tv_sec, ts.tv_nsec,
+        ts.tv_sec + ts.tv_nsec / 1000000000.0);
+
+    return 0;
+}
+```
+
+
+### Puts
+puts() is a standard library function from <stdio.h> that prints a string to stdout (the screen) and automatically adds a newline at the end.
+```c
+#include <stdio.h>
+
+int main(void) {
+    puts("Hello, world!");
+
+    // Compare it to printf:
+    printf("Hello, world!\n"); // you have to add \n yourself
+    puts("Hello, world!");     // \n is added automatically, no format
+                               // specifiers, no multiple arguments
+
+    return 0;
+}
+```
+
+### <string.h> String Manipulation
+
+
+```c
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <locale.h>
+#include <errno.h>
+#include <ctype.h>
+
+int main(void)
+{
+    char buf[100];
+
+    // --- memcpy() / memmove(): copy raw bytes (dest first, like '=') ---
+    char s1[100] = "Goats", t1[100];
+    memcpy(t1, s1, 6);        // non-overlapping copy
+    memmove(s1 + 2, s1, 6);   // overlapping copy (safe, unlike memcpy)
+
+    // --- memccpy() (C23): copy until char 'c' found, or n bytes copied ---
+    // void *memccpy(dest, src, int c, size_t n);
+
+    // --- strcpy() / strncpy(): copy a string ---
+    char dest[20];
+    strcpy(dest, "I like ");                 // "I like "
+    int len = strlen(dest);
+    strncpy(dest + len, "hockey hockey", sizeof(dest) - len - 1);
+    dest[sizeof(dest) - 1] = '\0';            // strncpy may NOT null-terminate — do it yourself
+
+    // --- strdup() / strndup() (C23): duplicate a string on the heap, free() when done ---
+    char *dup = strdup("hello, world!");
+    dup[0] = toupper(dup[0]);                 // "Hello, world!"
+    free(dup);
+
+    // --- strcat() / strncat(): append src onto dest (dest must have room!) ---
+    char dest2[30] = "Hello";
+    strcat(dest2, ", World!");                // "Hello, World!"
+    strncat(dest2, "12345678", 3);            // append only first 3 chars: "...123"
+
+    // --- strcmp() / strncmp() / memcmp(): compare, returns <0, 0, >0 ---
+    if (!strcmp("Muffin", "Muffin"))          // 0 == equal, so !0 == true
+        puts("Strings match");
+    strncmp("Muffin", "Muffin Sandwich", 6);  // compare only first 6 chars -> 0
+
+    // --- strcoll(): like strcmp() but locale-aware (handles accents sanely) ---
+    setlocale(LC_ALL, "");
+    strcoll("\u00e9", "f");                   // "é" vs "f", locale-correct ordering
+
+    // --- strxfrm(): pre-transform a string for fast repeated strcoll()-style comparisons ---
+    int xlen = strxfrm(NULL, "abc", 0) + 1;   // NULL/0 = just get required length
+    char *xbuf = malloc(xlen);
+    strxfrm(xbuf, "abc", xlen);               // xbuf now ready for strcmp()
+    free(xbuf);
+
+    // --- strchr() / strrchr() / memchr(): find a char (first / last / in n bytes) ---
+    char *str = "Hello, world!";
+    char *p = strchr(str, ',');               // first ',' 
+    p = strrchr(str, 'o');                    // last 'o'
+    p = memchr(str, '!', strlen(str));        // ignores NUL, scans n bytes
+
+    // --- strspn() / strcspn(): length of leading run of (accept / non-reject) chars ---
+    strspn("a banana", "aeiou");              // 1 -> just "a"
+    strcspn("the bolivian navy", "y");        // chars before first 'y'
+
+    // --- strpbrk(): find first char in s1 that's ANY of the chars in s2 ---
+    p = strpbrk("Hello, world!", "dow!");     // points at first matching char ('o')
+
+    // --- strstr(): find a substring inside a string ---
+    p = strstr("The quick brown fox", "brown");  // -> "brown fox"
+
+    // --- strtok(): destructively split a string by delimiter chars ---
+    char tokbuf[] = "Where is my bacon, dude?";
+    char *token = strtok(tokbuf, ".,?! ");
+    while (token != NULL) {
+        printf("Word: \"%s\"\n", token);
+        token = strtok(NULL, ".,?! ");        // pass NULL to continue same string
+    }
+
+    // --- memset() / memset_explicit() (C23): fill memory with a byte value ---
+    struct { float a; char *b; int c; } st;
+    memset(&st, 0, sizeof st);                // zero out a struct
+    // memset_explicit(&password, 0, sizeof password); // guaranteed not optimized away (for secrets)
+
+    // --- strerror(): get human-readable string for an errno value ---
+    FILE *fp = fopen("NONEXISTENT.TXT", "r");
+    if (fp == NULL)
+        printf("Error %d: %s\n", errno, strerror(errno)); // "No such file or directory"
+
+    // --- strlen(): length of a string, NOT counting the NUL terminator ---
+    printf("Length: %zu\n", strlen("Hello, world!")); // 13
+
+    return 0;
+}
+```
+
+
+### <stdlib.h> Standard Library Functions
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <locale.h>
+#include <wchar.h>
+#include <time.h>
+#include <stdint.h>
+
+// --- comparator for bsearch()/qsort() ---
+int compar(const void *a, const void *b) {
+    const int *x = a, *y = b;
+    return *x - *y; // negative/0/positive
+}
+
+// --- atexit() handlers ---
+void exit_handler_1(void) { printf("Exit handler 1 called!\n"); }
+void exit_handler_2(void) { printf("Exit handler 2 called!\n"); }
+
+int main(void)
+{
+    setlocale(LC_ALL, "");
+
+    // ====== String <-> number conversions ======
+    double d1 = atof("3.141593");                  // basic, no error checking
+    int    i1 = atoi("3490");                       // basic, no error checking
+    long   i2 = atol("123456");
+    long long i3 = atoll("123456789012");
+
+    char *badchar;
+    double d2 = strtod("   123.4567beej", &badchar);     // robust: detects bad chars
+    printf("strtod: %f, stopped at: \"%s\"\n", d2, badchar);
+
+    long l1 = strtol("0x123", NULL, 0);              // base 0 = auto-detect (hex here)
+    long l2 = strtol("101010", NULL, 2);             // explicit binary
+    unsigned long ul1 = strtoul("4000000000", NULL, 10);
+    printf("strtol/strtoul: %ld %ld %lu\n", l1, l2, ul1);
+
+    // ====== Pseudorandom numbers ======
+    srand((unsigned)time(NULL));                      // seed once
+    int r = rand() % 10;                               // 0-9 (biased, but fine for casual use)
+    printf("Random 0-9: %d\n", r);
+
+    // ====== Dynamic memory ======
+    int *p = malloc(5 * sizeof(int));                  // uninitialized memory
+    int *q = calloc(5, sizeof(int));                    // zeroed memory
+    int *aligned = aligned_alloc(256, 10 * sizeof(int)); // specific alignment
+    p = realloc(p, 10 * sizeof(int));                    // resize (may move!)
+    free(p); free(q); free(aligned);
+
+    // ====== Integer math ======
+    printf("abs(-7) = %d\n", abs(-7));
+    div_t dv = div(64, -7);
+    printf("64 / -7 -> quot=%d rem=%d\n", dv.quot, dv.rem);
+
+    // ====== Sorting & searching ======
+    int arr[9] = {14, 2, 3, 17, 10, 8, 6, 1, 13};
+    qsort(arr, 9, sizeof(int), compar);                  // sort in place
+    int
+```
+
+
+```c
+#include <stdio.h>
+#include <stdarg.h>
+#include <string.h>
+#include <errno.h>
+#include <ctype.h>
+#include <time.h>
+
+// printf()-style wrapper using va_list
+int logger(const char *format, ...) {
+    va_list va;
+    time_t now = time(NULL);
+    struct tm *t = gmtime(&now);
+    printf("%04d-%02d-%02d %02d:%02d:%02d : ",
+        t->tm_year + 1900, t->tm_mon + 1, t->tm_mday,
+        t->tm_hour, t->tm_min, t->tm_sec);
+    va_start(va, format);
+    int result = vprintf(format, va);   // vprintf/vfprintf/vsprintf/vsnprintf all work the same way
+    va_end(va);
+    printf("\n");
+    return result;
+}
+
+int main(void)
+{
+    FILE *fp;
+    char s[128];
+    int a, c;
+
+    // ====== Opening / closing ======
+    fp = fopen("spoon.txt", "w+");          // r, w, a, r+, w+, a+  (+ "b" for binary)
+    if (fp == NULL) {
+        perror("fopen");                     // human-readable error using errno
+        return 1;
+    }
+
+    // ====== Writing (formatted, char, string) ======
+    fprintf(fp, "Line %d: %s\n", 1, "hello"); // formatted write to file
+    fputc('X', fp);                            // single char
+    fputs("World\n", fp);                       // string (no formatting)
+    fflush(fp);                                 // force buffered output to disk now
+
+    // ====== Positioning ======
+    fseek(fp, 0, SEEK_SET);     // SEEK_SET / SEEK_CUR / SEEK_END
+    long pos = ftell(fp);       // current byte offset
+    fpos_t fpos;
+    fgetpos(fp, &fpos);         // opaque position (alt to ftell)
+    fsetpos(fp, &fpos);         // restore opaque position
+    rewind(fp);                 // same as fseek(fp, 0, SEEK_SET)
+
+    // ====== Reading (formatted, char, string) ======
+    fscanf(fp, "Line %d: %s", &a, s);   // formatted read
+    c = fgetc(fp);                        // single char (returns int, check EOF)
+    fgets(s, sizeof(s), fp);              // safe line read (use over gets()! gets() removed in C11)
+
+    // ====== Console I/O (== file I/O on stdin/stdout/stderr) ======
+    printf("Hello, world!\n");            // == fprintf(stdout, ...)
+    // scanf("%d", &a);                   // == fscanf(stdin, "%d", &a)
+    putchar('A');                          // == putc('A', stdout)
+    puts("A string with auto newline");
+
+    // ====== String-based formatting (no file involved) ======
+    sprintf(s, "x=%d", 42);                // unsafe — no bounds check
+    snprintf(s, sizeof(s), "x=%d", 42);    // SAFE — always NUL-terminates
+    sscanf("42-7", "%d-%d", &a, &c);       // parse from a string
+
+    // ====== printf format specifier cheat sheet ======
+    printf("%d\n", 100);            // decimal int
+    printf("%5d|\n", 100);          // field width, right-justified: "  100|"
+    printf("%-5d|\n", 100);         // left-justified:                "100  |"
+    printf("%05d\n", 100);          // zero-padded:                   "00100"
+    printf("%.2f\n", 3.14159);      // 2 decimal places: "3.14"
+    printf("%x %X\n", 255, 255);    // hex lower/upper: "ff FF"
+    printf("%*d\n", 8, 42);         // dynamic field width via '*'
+
+    // ====== scanf scanset / discard ======
+    // scanf(" %[^\n]", s);          // read until newline
+    // scanf("%d %*d %d", &a, &c);   // '*' discards a value without storing it
+
+    // ====== Binary I/O ======
+    int nums[5] = {1, 2, 3, 4, 5};
+    FILE *bin = fopen("numbers.dat", "wb");
+    fwrite(nums, sizeof(int), 5, bin);    // write raw binary block
+    fclose(bin);
+
+    bin = fopen("numbers.dat", "rb");
+    fread(nums, sizeof(int), 5, bin);     // read raw binary block
+    fclose(bin);
+
+    // ====== Push a char back onto the stream ======
+    int peek = fgetc(fp);
+    ungetc(peek, fp);                      // "unread" it — shows up again on next read
+
+    // ====== Status checks ======
+    if (feof(fp))   printf("Reached EOF\n");
+    if (ferror(fp)) printf("Stream error occurred\n");
+    clearerr(fp);                          // reset both flags
+
+    // ====== Buffering control ======
+    setvbuf(fp, NULL, _IOFBF, 1024);       // _IOFBF full, _IOLBF line, _IONBF none
+    // setbuf(fp, NULL);                   // shorthand for unbuffered
+
+    // ====== Temp files ======
+    FILE *tmp = tmpfile();                  // auto-deleted on close/exit
+    fprintf(tmp, "scratch data");
+    fclose(tmp);
+
+    char tmpname[L_tmpnam];
+    tmpnam(tmpname);                        // generates a unique filename (prefer mkstemp() if available)
+
+    // ====== File management ======
+    fclose(fp);
+    rename("spoon.txt", "spoon_renamed.txt");  // rename/move
+    remove("spoon_renamed.txt");                // delete from disk
+
+    // ====== Custom va_list-based printf wrapper ======
+    logger("x = %d", a);
+
+    return 0;
+}
+```
+
+### Standard definition
+```c
+#include <stdio.h>
+#include <stddef.h>
+#include <stdalign.h>
+#include <uchar.h>
+#include <string.h>
+
+struct foo {
+    int a;
+    char b;
+    char c;
+    float d;
+};
+
+int main(void)
+{
+    // --- ptrdiff_t: signed difference between two pointers ---
+    int cats[100];
+    int *f = cats + 20;
+    int *g = cats + 60;
+    ptrdiff_t d = g - f;             // 40
+    printf("ptrdiff (dec): %td\n", d);
+    printf("ptrdiff (hex): %tX\n", d);
+
+    // --- size_t: unsigned, returned by sizeof(), printed with %zu ---
+    size_t x = sizeof(int);
+    printf("sizeof(int): %zu\n", x);
+
+    // Some functions (e.g. mbrtoc16) return negative error codes cast
+    // to size_t — print those with %zd to see the signed value correctly:
+    char16_t wc;
+    mbstate_t mbs;
+    memset(&mbs, 0, sizeof mbs);
+    x = mbrtoc16(&wc, "b", 8, &mbs);
+    printf("mbrtoc16 result (signed view): %zd\n", x);
+
+    // --- max_align_t: largest fundamental alignment on this platform ---
+    printf("Max fundamental alignment: %d\n", (int)alignof(max_align_t));
+
+    // --- wchar_t: wide character type (just an int-family type, not shown directly) ---
+    wchar_t wide_null = 0; // 0 is the wide NUL character
+
+    // --- offsetof: byte offset of a field within a struct/union ---
+    printf("offsetof a: %zu\n", offsetof(struct foo, a));
+    printf("offsetof b: %zu\n", offsetof(struct foo, b));
+    printf("offsetof c: %zu\n", offsetof(struct foo, c));
+    printf("offsetof d: %zu\n", offsetof(struct foo, d));
+
+    return 0;
+}
+```
+
+
+### Setjump
+```c
+#include <stdio.h>
+#include <setjmp.h>
+
+jmp_buf env; // opaque type holding the "bookmark" to jump back to
+
+void depth2(void)
+{
+    printf("Entering depth 2\n");
+    longjmp(env, 3490);           // jump back to setjmp() — never returns
+    printf("Leaving depth 2\n");  // never runs
+}
+
+void depth1(void)
+{
+    printf("Entering depth 1\n");
+    depth2();
+    printf("Leaving depth 1\n");  // never runs
+}
+
+int main(void)
+{
+    // setjmp() returns 0 the first time (setting the bookmark),
+    // and returns the value passed to longjmp() when jumped back to.
+    switch (setjmp(env)) {
+        case 0:
+            printf("setjmp() returned 0 (initial call)\n");
+            depth1();
+            printf("This never runs\n"); // skipped due to longjmp()
+            break;
+
+        case 3490:
+            printf("Bailed back to main, setjmp() returned 3490\n");
+            break;
+    }
+
+    return 0;
+}
+```
